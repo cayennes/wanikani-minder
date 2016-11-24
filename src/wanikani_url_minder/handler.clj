@@ -39,7 +39,13 @@
   (apply str (repeat n "w ")))
 
 (def intro-page
-  (html [:p "Sorry, no documentation yet"]))
+  (html [:div
+         [:h1 "WaniKani URL Minder"]
+         [:h2 "Whittling down a backlog"]
+         [:code "https://wanikani-url-minder.herokuapp.com/v1/user/[insert wanikani token here]/backlog-reduction-from/[insert starting count here]"]
+         [:h2  "Total studied items"]
+         [:p "It's probably a terrible idea to beemind this; make it a modest goal keep a good buffer if you do in case you don't unlock lessons in time."]
+         [:code "https://wanikani-url-minder.herokuapp.com/v1/user/[insert wanikani token here]/items-ever-studied"]]))
 
 ;; handler
 
