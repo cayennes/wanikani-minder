@@ -10,7 +10,8 @@
                  [hiccup "1.0.5"]]
   :plugins [[lein-ring "0.9.7"]]
   :ring {:handler wanikani-url-minder.handler/app
-         :nrepl {:start? true}}
+         ;; :nrepl {:start? true}
+         }
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [ring/ring-mock "0.3.0"]]}})
