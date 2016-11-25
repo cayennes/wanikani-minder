@@ -9,11 +9,11 @@
 
 (defn study-queue-url
   [wanikani-key]
-  (format "https://www.wanikani.com/api/user/%s/study-queue" wanikani-key))
+  (format "https://www.wanikani.com/api/v1/user/%s/study-queue" wanikani-key))
 
 (defn srs-distribution-url
   [wanikani-key]
-  (format "https://www.wanikani.com/api/user/%s/srs-distribution" wanikani-key))
+  (format "https://www.wanikani.com/api/v1/user/%s/srs-distribution" wanikani-key))
 
 
 (defn get-due-count
@@ -40,22 +40,30 @@
 
 (def intro-page
   (html [:div
-         [:h1 "WaniKani URL Minder"]
-         [:h2 "Whittling down a backlog"]
-         [:code "https://wanikani-url-minder.herokuapp.com/v1/user/[insert wanikani token here]/backlog-reduction-from/[insert starting count here]"]
+         [:h1 "WaniKani URLminder"]
+         [:p "Automatically beemind WaniKani progress via a URLminder goal using one of these special urls."]
+         [:h2 "Reducing a large review queue"]
+         [:p "Since URLminder goals only count up, beemind clearing out a large review backlog by the amount reduced.  Include the starting size in the URL and make it your goal target."]
+         [:code "https://wanikani-url-minder.herokuapp.com/api/user/"
+          [:span {:style "color:green;"} "[insert wanikani token here]"]
+          "/backlog-reduction-from/"
+          [:span {:style "color:green;"} "[insert starting count here]"]]
          [:h2  "Total studied items"]
+         [:p "The number of different items that you've started reviewing."]
          [:p "It's probably a terrible idea to beemind this; make it a modest goal keep a good buffer if you do in case you don't unlock lessons in time."]
-         [:code "https://wanikani-url-minder.herokuapp.com/v1/user/[insert wanikani token here]/items-ever-studied"]]))
+         [:code "https://wanikani-url-minder.herokuapp.com/api/user/"
+          [:span {:style "color:green;"} "[insert wanikani token here]"]
+          "/total-studied"]]))
 
 ;; handler
 
 (defroutes app-routes
   (GET "/" [] intro-page)
-  (GET "/v1/user/:wanikani-key/backlog-reduction-from/:starting-due"
+  (GET "/api/user/:wanikani-key/backlog-reduction-from/:starting-due"
        [wanikani-key starting-due]
        (n-word-string (- (Integer/parseInt starting-due)
                          (get-due-count wanikani-key))))
-  (GET "/v1/user/:wanikani-key/items-ever-studied"
+  (GET "/api/user/:wanikani-key/total-studied"
        [wanikani-key]
        (n-word-string (get-total wanikani-key)))
   (route/not-found "Not Found"))
