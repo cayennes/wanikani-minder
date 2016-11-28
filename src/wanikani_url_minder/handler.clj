@@ -41,17 +41,17 @@
 (def intro-page
   (html [:div
          [:h1 "WaniKani URLminder"]
-         [:p "Automatically beemind WaniKani progress via a URLminder goal using one of these special urls."]
+         [:p "Automatically be#emind WaniKani progress via a URLminder goal using one of these special urls."]
          [:h2 "Reducing a large review queue"]
          [:p "Since URLminder goals only count up, beemind clearing out a large review backlog by the amount reduced.  Include the starting size in the URL and make it your goal target."]
-         [:code "https://wanikani-url-minder.herokuapp.com/api/user/"
+         [:code "https://web-glue.herokuapp.com/wanikani-urlminder/user/"
           [:span {:style "color:green;"} "[insert wanikani token here]"]
           "/backlog-reduction-from/"
           [:span {:style "color:green;"} "[insert starting count here]"]]
          [:h2  "Total studied items"]
          [:p "The number of different items that you've started reviewing."]
          [:p "It's probably a terrible idea to beemind this; make it a modest goal keep a good buffer if you do in case you don't unlock lessons in time."]
-         [:code "https://wanikani-url-minder.herokuapp.com/api/user/"
+         [:code "https://web-glue.herokuapp.com/wanikani-urlminder/user/"
           [:span {:style "color:green;"} "[insert wanikani token here]"]
           "/total-studied"]]))
 
@@ -59,11 +59,12 @@
 
 (defroutes app-routes
   (GET "/" [] intro-page)
-  (GET "/api/user/:wanikani-key/backlog-reduction-from/:starting-due"
+  (GET "/wanikani-urlminder" [] intro-page)
+  (GET "/wanikani-urlminder/user/:wanikani-key/backlog-reduction-from/:starting-due"
        [wanikani-key starting-due]
        (n-word-string (- (Integer/parseInt starting-due)
                          (get-due-count wanikani-key))))
-  (GET "/api/user/:wanikani-key/total-studied"
+  (GET "/wanikani-urlminder/user/:wanikani-key/total-studied"
        [wanikani-key]
        (n-word-string (get-total wanikani-key)))
   (route/not-found "Not Found"))
