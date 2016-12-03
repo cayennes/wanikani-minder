@@ -41,18 +41,18 @@
 (def intro-page
   (html [:div
          [:h1 "WaniKani URLminder"]
-         [:p "Automatically be#emind WaniKani progress via a URLminder goal using one of these special urls."]
+         [:p "Automatically beemind WaniKani progress via a URLminder goal using one of these special urls.  You can find you WaniKani API key in settings."]
          [:h2 "Reducing a large review queue"]
          [:p "Since URLminder goals only count up, beemind clearing out a large review backlog by the amount reduced.  Include the starting size in the URL and make it your goal target."]
          [:code "https://web-glue.herokuapp.com/wanikani-urlminder/user/"
-          [:span {:style "color:green;"} "[insert wanikani token here]"]
+          [:span {:style "color:green;"} "[insert WaniKani API key here]"]
           "/backlog-reduction-from/"
           [:span {:style "color:green;"} "[insert starting count here]"]]
          [:h2  "Total studied items"]
          [:p "The number of different items that you've started reviewing."]
          [:p "It's probably a terrible idea to beemind this; make it a modest goal keep a good buffer if you do in case you don't unlock lessons in time."]
          [:code "https://web-glue.herokuapp.com/wanikani-urlminder/user/"
-          [:span {:style "color:green;"} "[insert wanikani token here]"]
+          [:span {:style "color:green;"} "[insert WaniKani API key here]"]
           "/total-studied"]]))
 
 ;; handler
