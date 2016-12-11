@@ -53,7 +53,12 @@
          [:p "It's probably a terrible idea to beemind this; make it a modest goal keep a good buffer if you do in case you don't unlock lessons in time."]
          [:code "https://web-glue.herokuapp.com/wanikani-urlminder/user/"
           [:span {:style "color:green;"} "[insert WaniKani API key here]"]
-          "/total-studied"]]))
+          "/total-studied"]
+         [:h2 "Maintained progress"]
+         [:p "Total studied minus total due."]
+         [:code "https://web-glue.herokuapp.com/wanikani-urlminder/user/"
+          [:span {:style "color:green;"} "[insert WaniKani API key here]"
+           "/maintained-progress"]]]))
 
 ;; handler
 
@@ -67,6 +72,9 @@
   (GET "/wanikani-urlminder/user/:wanikani-key/total-studied"
        [wanikani-key]
        (n-word-string (get-total wanikani-key)))
+  (GET "/wanikani-urlminder/user/:wanikani-key/maintained-progress"
+       [wanikani-key]
+       (n-word-string (- (get-total wanikani-key) (get-due-count wanikani-key))))
   (route/not-found "Not Found"))
 
 (def app
