@@ -15,7 +15,6 @@
   [wanikani-key]
   (format "https://www.wanikani.com/api/v1/user/%s/srs-distribution" wanikani-key))
 
-
 (defn get-due-count
   [wanikani-key]
   (get-in (client/get (study-queue-url wanikani-key)
@@ -36,7 +35,7 @@
 
 (defn n-word-string
   [n]
-  (apply str n (repeat (dec n) "w ")))
+  (apply str n " " (repeat (dec n) "w ")))
 
 (def intro-page
   (html [:div
