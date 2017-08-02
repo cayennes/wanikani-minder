@@ -36,7 +36,7 @@
 
 (defn n-word-string
   [n]
-  (apply str (repeat n "w ")))
+  (apply str n (repeat (dec n) "w ")))
 
 (def intro-page
   (html [:div
