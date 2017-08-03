@@ -35,7 +35,9 @@
 
 (defn n-word-string
   [n]
-  (apply str n " " (repeat (dec n) "w ")))
+  (->> (cons n (repeat "w"))
+       (take n)
+       (clojure.string/join " ")))
 
 (def intro-page
   (html [:div
