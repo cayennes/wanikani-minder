@@ -2,8 +2,59 @@
   (:require [compojure.core :refer [defroutes GET]]
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
+            [ring.util.codec :refer [url-encode]]
             [clj-http.client :as client]
             [hiccup.core :refer [html]]))
+
+;; # stuff
+
+;; initialization
+
+(def config
+  {:beeminder-client-secret (System/getenv "BEEMINDER_CLIENT_SECRET")
+   :beeminder-client-id (System/getenv "BEEMINDER_CLIENT_ID")
+   :base-url (System/getenv "BASE_URL")})
+
+(assert (every? some? (keys config)))
+
+;; auth
+
+(defn redirect-uri
+  []
+  (str (:base-url config) "auth/beeminder/callback"))
+
+(defn authorize-url
+  []
+  (str "https://www.beeminder.com/apps/authorize?"
+       "client_id=" (:beeminder-client-id config)
+       "&redirect_uri=" (url-encode (redirect-uri))
+       "&response_type=token"))
+
+(defn landing-page
+  [& args]
+  (print args)
+  (html [:div
+         [:h1 "WaniKani Minder"]
+         [:p "Automatically beemind WaniKani progress"]
+         [:p [:a {:href (authorize-url)} "Login via beeminder"]]]))
+
+(defn beeminder-login
+  [access-token username]
+  (html [:div
+         [:h1 "Welcome"]
+         [:p "You've logged in as " username]]))
+
+(defn error-page
+  [error error-description]
+  (html [:div
+         [:h1 "Error: " error]
+         [:p error-description]
+         (when (= error "redirect_uri_mismatch")
+           [:p
+            "redirect_uri is " (redirect-uri)
+            " and authorize url was " (authorize-url)])]))
+
+;; # legacy urlminder hack
 
 ;; wanikani access
 
@@ -61,10 +112,16 @@
           [:span {:style "color:green;"} "[insert WaniKani API key here]"
            "/maintained-progress"]]]))
 
-;; handler
+;; # handler
 
 (defroutes app-routes
-  (GET "/" [] intro-page)
+  ;; new
+  (GET "/" [] landing-page)
+  (GET "/auth/beeminder/callback" [access_token username error error_description]
+       (if-not error
+         (beeminder-login access_token username)
+         (error-page error error_description)))
+  ;; old
   (GET "/wanikani-urlminder" [] intro-page)
   (GET "/wanikani-urlminder/user/:wanikani-key/backlog-reduction-from/:starting-due"
        [wanikani-key starting-due]
