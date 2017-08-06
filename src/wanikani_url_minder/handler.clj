@@ -3,6 +3,7 @@
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
             [ring.util.codec :refer [url-encode]]
+            [ring.util.response :as response]
             [clj-http.client :as client]
             [wanikani-minder.pages :as pages]))
 
@@ -29,6 +30,22 @@
        "client_id=" (:beeminder-client-id config)
        "&redirect_uri=" (url-encode (redirect-uri))
        "&response_type=token"))
+
+(defn homepage
+  [session]
+  (if-let [username (get-in session [:beeminder :username])]
+    (pages/logged-in-homepage username)
+    (pages/logged-out-homepage (authorize-url))))
+
+(defn login
+  [session access-token username]
+  (assoc-in (response/redirect "/")
+            [:session :beeminder] {:username username :token access-token}))
+
+(defn logout
+  [session]
+  (update (response/redirect "/") :session dissoc :beeminder))
+
 
 ;; # legacy urlminder hack
 
@@ -70,13 +87,15 @@
 
 (defroutes app-routes
   ;; new
-  (GET "/" [] (pages/landing (authorize-url)))
-  (GET "/auth/beeminder/callback" [access_token username error error_description]
+  (GET "/" {session :session} (homepage session))
+  (GET "/auth/beeminder/callback" [access_token username error error_description
+                                   :as {session :session}]
        (if-not error
-         (pages/beeminder-login access_token username)
+         (login session access_token username)
          (pages/error error error_description)))
+  (GET "/auth/logout" {session :session} (logout session))
   ;; old
-  (GET "/wanikani-urlminder" [] pages/legacy-intro)
+  (GET "/wanikani-urlminder" [] (pages/legacy-intro))
   (GET "/wanikani-urlminder/user/:wanikani-key/backlog-reduction-from/:starting-due"
        [wanikani-key starting-due]
        (n-word-string (- (Integer/parseInt starting-due)

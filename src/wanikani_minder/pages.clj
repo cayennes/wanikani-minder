@@ -1,18 +1,19 @@
 (ns wanikani-minder.pages
   (:require [hiccup.core :refer [html]]))
 
-(defn landing
+(defn logged-out-homepage
   [beeminder-authorize-url]
   (html [:div
          [:h1 "WaniKani Minder"]
          [:p "Automatically beemind WaniKani progress"]
          [:p [:a {:href beeminder-authorize-url} "Login via beeminder"]]]))
 
-(defn beeminder-login
-  [access-token username]
+(defn logged-in-homepage
+  [username]
   (html [:div
-         [:h1 "Welcome"]
-         [:p "You've logged in as " username]]))
+         [:h1 "WaniKani Minder"]
+         [:p "Welcome, " username]
+         [:p [:a {:href "/auth/logout"} "Log out"]]]))
 
 (defn error
   [error error-description]
@@ -20,7 +21,8 @@
          [:h1 "Error: " error]
          [:p error-description]]))
 
-(def legacy-intro
+(defn legacy-intro
+  []
   (html [:div
          [:h1 "WaniKani URLminder"]
          [:p "Automatically beemind WaniKani progress via a URLminder goal using one of these special urls.  You can find you WaniKani API key in settings."]
