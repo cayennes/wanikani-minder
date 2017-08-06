@@ -12,9 +12,9 @@
 ;; initialization
 
 (def config
-  {:beeminder-client-secret (System/getenv "BEEMINDER_CLIENT_SECRET")
-   :beeminder-client-id (System/getenv "BEEMINDER_CLIENT_ID")
    :base-url (System/getenv "BASE_URL")})
+  {:beeminder {:client-secret (System/getenv "BEEMINDER_CLIENT_SECRET")
+               :client-id (System/getenv "BEEMINDER_CLIENT_ID")}
 
 (assert (every? some? (keys config)))
 
@@ -27,7 +27,7 @@
 (defn authorize-url
   []
   (str "https://www.beeminder.com/apps/authorize?"
-       "client_id=" (:beeminder-client-id config)
+       "client_id=" (get-in config [:beeminder :client-id])
        "&redirect_uri=" (url-encode (redirect-uri))
        "&response_type=token"))
 
