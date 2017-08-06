@@ -1,4 +1,4 @@
-(defproject wanikani-url-minder "0.1.0-SNAPSHOT"
+(defproject web-glue "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :min-lein-version "2.0.0"
@@ -9,7 +9,7 @@
                  [cheshire "5.6.3"]
                  [hiccup "1.0.5"]]
   :plugins [[lein-ring "0.9.7"]]
-  :ring {:handler wanikani-url-minder.handler/app
+  :ring {:handler wanikani-minder.handler/app
          ;; :nrepl {:start? true}
          }
   :profiles

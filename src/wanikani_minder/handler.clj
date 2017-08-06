@@ -1,4 +1,4 @@
-(ns wanikani-url-minder.handler
+(ns wanikani-minder.handler
   (:require [compojure.core :refer [defroutes GET]]
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
@@ -45,7 +45,6 @@
 (defn logout
   [session]
   (update (response/redirect "/") :session dissoc :beeminder))
-
 
 ;; # legacy urlminder hack
 
