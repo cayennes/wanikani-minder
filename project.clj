@@ -2,16 +2,24 @@
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :min-lein-version "2.0.0"
+
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [compojure "1.5.1"]
                  [ring/ring-defaults "0.2.1"]
                  [clj-http "3.6.1"]
                  [cheshire "5.6.3"]
-                 [hiccup "1.0.5"]]
+                 [hiccup "1.0.5"]
+                 [org.postgresql/postgresql "9.4-1201-jdbc41"]
+                 [ragtime "0.7.1"]]
+
   :plugins [[lein-ring "0.9.7"]]
+
   :ring {:handler wanikani-minder.handler/app
          ;; :nrepl {:start? true}
          }
+
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
-                        [ring/ring-mock "0.3.0"]]}})
+                        [ring/ring-mock "0.3.0"]]}}
+
+  :aliases {"migrate" ["run" "-m" "wanikani-minder.migrations/migrate"]})

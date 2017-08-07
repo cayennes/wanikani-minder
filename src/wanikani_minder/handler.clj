@@ -5,18 +5,10 @@
             [ring.util.codec :refer [url-encode]]
             [ring.util.response :as response]
             [clj-http.client :as client]
+            [wanikani-minder.config :refer [config]]
             [wanikani-minder.pages :as pages]))
 
 ;; # stuff
-
-;; initialization
-
-(def config
-   :base-url (System/getenv "BASE_URL")})
-  {:beeminder {:client-secret (System/getenv "BEEMINDER_CLIENT_SECRET")
-               :client-id (System/getenv "BEEMINDER_CLIENT_ID")}
-
-(assert (every? some? (keys config)))
 
 ;; auth
 
