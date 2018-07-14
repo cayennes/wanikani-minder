@@ -32,6 +32,10 @@ A .env file containing
 
     $ lein migrate
 
+or to roll back (warning: lossy):
+
+    $ lein rollback
+
 ## Relevant documentation
 
 https://blog.beeminder.com/autofetch
@@ -44,7 +48,7 @@ https://www.wanikani.com/api - current API which this uses; there is a v2 in ope
 Necessary
 
 - [x] beeminder oauth login
-- [ ] store beeminder login in the DB
+- [x] store beeminder login in the DB
 - [ ] ability to enter and store WaniKani API token
 - [ ] ability to link to beeminder goals, and store what stat to use for the goal in the db
 - [ ] implement the endpoint that will report data to Beeminder

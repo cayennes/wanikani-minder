@@ -6,7 +6,8 @@
             [ring.util.response :as response]
             [clj-http.client :as client]
             [wanikani-minder.config :refer [config]]
-            [wanikani-minder.pages :as pages]))
+            [wanikani-minder.pages :as pages]
+            [wanikani-minder.db.user :as user]))
 
 ;; # stuff
 
@@ -31,6 +32,7 @@
 
 (defn login
   [session access-token username]
+  (user/beeminder-create-or-update! {:username username :access-token access-token})
   (assoc-in (response/redirect "/")
             [:session :beeminder] {:username username :token access-token}))
 

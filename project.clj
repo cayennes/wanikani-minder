@@ -9,8 +9,10 @@
                  [clj-http "3.6.1"]
                  [cheshire "5.6.3"]
                  [hiccup "1.0.5"]
-                 [org.postgresql/postgresql "9.4-1201-jdbc41"]
-                 [ragtime "0.7.1"]]
+                 [org.postgresql/postgresql "42.2.2"]
+                 [ragtime "0.7.1"]
+                 [com.layerware/hugsql "0.4.8"]
+                 [com.carouselapps/to-jdbc-uri "0.5.0"]]
 
   :plugins [[lein-ring "0.9.7"]]
 
@@ -22,4 +24,5 @@
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [ring/ring-mock "0.3.0"]]}}
 
-  :aliases {"migrate" ["run" "-m" "wanikani-minder.migrations/migrate"]})
+  :aliases {"migrate" ["run" "-m" "wanikani-minder.migrations/migrate"]
+            "rollback" ["run" "-m" "wanikani-minder.migrations/rollback"]})
