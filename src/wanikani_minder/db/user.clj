@@ -13,3 +13,13 @@
    db
    {:beeminder_id username
     :beeminder_access_token access-token}))
+
+(defn update-wanikani-token! [beeminder-username wanikani-api-key]
+  (update-wanikani-api-key!*
+   db
+   {:beeminder_id beeminder-username
+    :wanikani_api_key wanikani-api-key}))
+
+(defn wanikani-api-key [beeminder-username]
+  (:wanikani_api_key
+   (wanikani-api-key* db {:beeminder_id beeminder-username})))

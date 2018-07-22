@@ -1,5 +1,6 @@
 (ns wanikani-minder.pages
-  (:require [hiccup.core :refer [html]]))
+  (:require [hiccup.core :refer [html]]
+            [ring.util.anti-forgery :as ring-af]))
 
 (defn logged-out-homepage
   [beeminder-authorize-url]
@@ -9,10 +10,19 @@
          [:p [:a {:href beeminder-authorize-url} "Login via beeminder"]]]))
 
 (defn logged-in-homepage
-  [username]
+  [beeminder-username wanikani-api-key]
   (html [:div
          [:h1 "WaniKani Minder"]
-         [:p "Welcome, " username]
+         [:p "Welcome, " beeminder-username]
+         (when wanikani-api-key
+           [:p "You have set WaniKani API key " wanikani-api-key])
+         [:form {:action "/settings" :method :post}
+          (ring-af/anti-forgery-field)
+          [:label {:for "wanikani-api-key"} "Enter WaniKani API key: "]
+          [:input {:type :text :id "wanikani-api-key" :name "wanikani-api-key"}]
+          " "
+          [:button {:type :submit} "Update"]]
+         [:p "You can find this in " [:a {:href "https://www.wanikani.com/settings/account"} "WaniKani's settings"]]
          [:p [:a {:href "/auth/logout"} "Log out"]]]))
 
 (defn error

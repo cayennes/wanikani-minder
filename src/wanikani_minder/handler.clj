@@ -1,5 +1,5 @@
 (ns wanikani-minder.handler
-  (:require [compojure.core :refer [defroutes GET]]
+  (:require [compojure.core :refer [defroutes GET POST]]
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
             [ring.util.codec :refer [url-encode]]
@@ -27,7 +27,7 @@
 (defn homepage
   [session]
   (if-let [username (get-in session [:beeminder :username])]
-    (pages/logged-in-homepage username)
+    (pages/logged-in-homepage username (user/wanikani-api-key username))
     (pages/logged-out-homepage (authorize-url))))
 
 (defn login
@@ -81,6 +81,11 @@
 (defroutes app-routes
   ;; new
   (GET "/" {session :session} (homepage session))
+  (POST "/"  [wanikani-api-key :as {:keys [session]}]
+        (let [beeminder-username (get-in session [:beeminder :username])]
+          (when wanikani-api-key
+            (user/update-wanikani-token! beeminder-username wanikani-api-key))
+          (homepage session)))
   (GET "/auth/beeminder/callback" [access_token username error error_description
                                    :as {session :session}]
        (if-not error
