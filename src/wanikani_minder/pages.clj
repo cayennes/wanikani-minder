@@ -10,19 +10,21 @@
          [:p [:a {:href beeminder-authorize-url} "Login via beeminder"]]]))
 
 (defn logged-in-homepage
-  [beeminder-username wanikani-api-key]
+  [{:keys [beeminder-username wanikani-api-key beeminder-goal-slug]}]
   (html [:div
          [:h1 "WaniKani Minder"]
          [:p "Welcome, " beeminder-username]
-         (when wanikani-api-key
-           [:p "You have set WaniKani API key " wanikani-api-key])
-         [:form {:action "/settings" :method :post}
+         [:form {:method :post}
           (ring-af/anti-forgery-field)
-          [:label {:for "wanikani-api-key"} "Enter WaniKani API key: "]
-          [:input {:type :text :id "wanikani-api-key" :name "wanikani-api-key"}]
-          " "
-          [:button {:type :submit} "Update"]]
-         [:p "You can find this in " [:a {:href "https://www.wanikani.com/settings/account"} "WaniKani's settings"]]
+          [:p [:label {:for "wanikani-api-key"} "WaniKani API key: "]
+           [:input {:type :text :id "wanikani-api-key" :name "wanikani-api-key"}]
+           " currently " (if wanikani-api-key wanikani-api-key "unset")
+           [:br]
+           "You can find this in " [:a {:href "https://www.wanikani.com/settings/account"} "WaniKani's settings"]]
+          [:p [:label {:for "beeminder-goal-slug"} "Beeminder goal name: "]
+           [:input {:type :text :id "beeminder-goal-slug" :name "beeminder-goal-slug"}]
+           " currently " (if beeminder-goal-slug beeminder-goal-slug "unset")]
+          [:p [:button {:type :submit} "Update"]]]
          [:p [:a {:href "/auth/logout"} "Log out"]]]))
 
 (defn error

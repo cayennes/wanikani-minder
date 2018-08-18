@@ -27,7 +27,7 @@
 (defn homepage
   [session]
   (if-let [username (get-in session [:beeminder :username])]
-    (pages/logged-in-homepage username (user/wanikani-api-key username))
+    (pages/logged-in-homepage (user/get username))
     (pages/logged-out-homepage (authorize-url))))
 
 (defn login
@@ -81,10 +81,12 @@
 (defroutes app-routes
   ;; new
   (GET "/" {session :session} (homepage session))
-  (POST "/"  [wanikani-api-key :as {:keys [session]}]
+  (POST "/"  [wanikani-api-key beeminder-goal-slug :as {:keys [session]}]
         (let [beeminder-username (get-in session [:beeminder :username])]
-          (when wanikani-api-key
+          (when (not-empty wanikani-api-key)
             (user/update-wanikani-token! beeminder-username wanikani-api-key))
+          (when (not-empty beeminder-goal-slug)
+            (user/update-beeminder-goal-slug! beeminder-username beeminder-goal-slug))
           (homepage session)))
   (GET "/auth/beeminder/callback" [access_token username error error_description
                                    :as {session :session}]
