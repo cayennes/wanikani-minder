@@ -35,6 +35,15 @@ A .env file containing
 or to roll back (warning: lossy):
 
     $ lein rollback
+    
+### to test webhooks locally
+
+[Install](https://dashboard.ngrok.com/get-started) [ngrok](https://ngrok.com) if it isn't already
+
+1. `ngrok http 3000`
+2. Go to the settings for the dev app on beeminder, and update the URLs to use the ngrok url (with trailing slash) instead of localhost
+3. Set BASE_URL to the ngrok url and run `lein ring server-headless`
+4. Go to the ngrok url
 
 ## Relevant documentation
 
