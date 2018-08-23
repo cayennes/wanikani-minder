@@ -58,9 +58,12 @@ Necessary
 
 - [x] beeminder oauth login
 - [x] store beeminder login in the DB
-- [ ] ability to enter and store WaniKani API token
-- [ ] ability to link to beeminder goals, and store what stat to use for the goal in the db
+- [x] ability to enter and store WaniKani API token
+- [ ] ability to link to beeminder goals 
 - [ ] implement the endpoint that will report data to Beeminder
+
+Maybe necessary
+- [ ] store what stat to use for the goal in the db
 
 Bonus
 
