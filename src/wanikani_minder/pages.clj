@@ -10,10 +10,10 @@
          [:p [:a {:href beeminder-authorize-url} "Login via beeminder"]]]))
 
 (defn logged-in-homepage
-  [{:keys [beeminder-username wanikani-api-key beeminder-goal-slug]}]
+  [{:keys [beeminder-id wanikani-api-key beeminder-goal-slug]}]
   (html [:div
          [:h1 "WaniKani Minder"]
-         [:p "Welcome, " beeminder-username]
+         [:p "Welcome, " beeminder-id]
          [:form {:method :post}
           (ring-af/anti-forgery-field)
           [:p [:label {:for "wanikani-api-key"} "WaniKani API key: "]
