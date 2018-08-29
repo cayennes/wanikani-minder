@@ -76,6 +76,10 @@
        (take n)
        (clojure.string/join " ")))
 
+(defn maintained-progress
+  [wanikani-key]
+  (- (get-total wanikani-key) (get-due-count wanikani-key)))
+
 ;; # handler
 
 (defroutes app-routes
@@ -94,6 +98,10 @@
          (login session access_token username)
          (pages/error error error_description)))
   (GET "/auth/logout" {session :session} (logout session))
+  (POST "/hooks/beeminder/autofetch" [username slug]
+        (-> (user/get username)
+            :wanikani-api-keu
+            maintained-progress))
   ;; old
   (GET "/wanikani-urlminder" [] (pages/legacy-intro))
   (GET "/wanikani-urlminder/user/:wanikani-key/backlog-reduction-from/:starting-due"
@@ -105,7 +113,7 @@
        (n-word-string (get-total wanikani-key)))
   (GET "/wanikani-urlminder/user/:wanikani-key/maintained-progress"
        [wanikani-key]
-       (n-word-string (- (get-total wanikani-key) (get-due-count wanikani-key))))
+       (n-word-string (maintained-progress wanikani-key)))
   (route/not-found (pages/error "not found" "No page found with this URL")))
 
 (def app
