@@ -1,4 +1,5 @@
 (ns wanikani-minder.db.user
+  (:refer-clojure :exclude [get])
   (:require [clojure.set :refer [rename-keys]]
             [hugsql.core :as hugsql]
             [to-jdbc-uri.core]

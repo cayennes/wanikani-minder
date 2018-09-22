@@ -1,15 +1,48 @@
 (ns wanikani-minder.handler
-  (:require [compojure.core :refer [defroutes GET POST]]
+  (:require [compojure.core :refer [routes defroutes GET POST]]
             [compojure.route :as route]
-            [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
+            [ring.middleware.defaults :refer [wrap-defaults api-defaults site-defaults]]
             [ring.util.codec :refer [url-encode]]
             [ring.util.response :as response]
+            [ring.middleware.json :as json]
             [clj-http.client :as client]
+            [wanikani-minder.beeminder :as beeminder]
             [wanikani-minder.config :refer [config]]
             [wanikani-minder.pages :as pages]
             [wanikani-minder.db.user :as user]))
 
 ;; # stuff
+
+;; wanikani access
+;; TODO: move to own namespace
+
+(defn study-queue-url
+  [wanikani-key]
+  (format "https://www.wanikani.com/api/v1/user/%s/study-queue" wanikani-key))
+
+(defn srs-distribution-url
+  [wanikani-key]
+  (format "https://www.wanikani.com/api/v1/user/%s/srs-distribution" wanikani-key))
+
+(defn get-due-count
+  [wanikani-key]
+  (get-in (client/get (study-queue-url wanikani-key)
+                      {:as :json})
+          [:body :requested_information :reviews_available]))
+
+(defn get-total
+  [wanikani-key]
+  (->> (client/get (srs-distribution-url wanikani-key)
+                   {:as :json})
+       :body
+       :requested_information
+       vals
+       (map :total)
+       (apply +)))
+
+(defn maintained-progress
+  [wanikani-key]
+  (- (get-total wanikani-key) (get-due-count wanikani-key)))
 
 ;; auth
 
@@ -40,33 +73,24 @@
   [session]
   (update (response/redirect "/") :session dissoc :beeminder))
 
+(defn set-beeminder-goal
+  [session new-goal]
+  (let [user (user/get (get-in session [:beeminder :username]))]
+    ;; register with beeminder as the handler for the new goal
+    (beeminder/register-autofetch user new-goal)
+    ;; store new value to database
+    (user/update-beeminder-goal-slug! (:beeminder-username user) new-goal)))
+
+(defn add-datapoint
+  [beeminder-username slug]
+  ;; TODO: check that the user does actually have that goal configured
+  (let [user (user/get beeminder-username)
+        value (-> user
+                  :wanikani-api-key
+                  maintained-progress)]
+    (beeminder/add-datapoint user slug {:value value})))
+
 ;; # legacy urlminder hack
-
-;; wanikani access
-
-(defn study-queue-url
-  [wanikani-key]
-  (format "https://www.wanikani.com/api/v1/user/%s/study-queue" wanikani-key))
-
-(defn srs-distribution-url
-  [wanikani-key]
-  (format "https://www.wanikani.com/api/v1/user/%s/srs-distribution" wanikani-key))
-
-(defn get-due-count
-  [wanikani-key]
-  (get-in (client/get (study-queue-url wanikani-key)
-                      {:as :json})
-          [:body :requested_information :reviews_available]))
-
-(defn get-total
-  [wanikani-key]
-  (->> (client/get (srs-distribution-url wanikani-key)
-                   {:as :json})
-       :body
-       :requested_information
-       vals
-       (map :total)
-       (apply +)))
 
 ;; make urlminder pages
 
@@ -76,11 +100,7 @@
        (take n)
        (clojure.string/join " ")))
 
-(defn maintained-progress
-  [wanikani-key]
-  (- (get-total wanikani-key) (get-due-count wanikani-key)))
-
-;; # handler
+;; # handlers
 
 (defroutes app-routes
   ;; new
@@ -90,7 +110,7 @@
           (when (not-empty wanikani-api-key)
             (user/update-wanikani-token! beeminder-username wanikani-api-key))
           (when (not-empty beeminder-goal-slug)
-            (user/update-beeminder-goal-slug! beeminder-username beeminder-goal-slug))
+            (set-beeminder-goal session beeminder-goal-slug))
           (homepage session)))
   (GET "/auth/beeminder/callback" [access_token username error error_description
                                    :as {session :session}]
@@ -98,10 +118,6 @@
          (login session access_token username)
          (pages/error error error_description)))
   (GET "/auth/logout" {session :session} (logout session))
-  (POST "/hooks/beeminder/autofetch" [username slug]
-        (-> (user/get username)
-            :wanikani-api-keu
-            maintained-progress))
   ;; old
   (GET "/wanikani-urlminder" [] (pages/legacy-intro))
   (GET "/wanikani-urlminder/user/:wanikani-key/backlog-reduction-from/:starting-due"
@@ -116,5 +132,14 @@
        (n-word-string (maintained-progress wanikani-key)))
   (route/not-found (pages/error "not found" "No page found with this URL")))
 
+(defroutes public-api-routes
+  (POST "/hooks/beeminder/autofetch" [username slug]
+        (add-datapoint username slug)
+        (response/response {:result "success"})))
+
 (def app
-  (wrap-defaults app-routes site-defaults))
+  (routes
+   (-> public-api-routes
+       (json/wrap-json-response)
+       (wrap-defaults api-defaults))
+   (wrap-defaults app-routes site-defaults)))

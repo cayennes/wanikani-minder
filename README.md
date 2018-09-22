@@ -20,6 +20,7 @@ A .env file containing
 
     BEEMINDER_CLIENT_SECRET=[from beeminder app registration]
     BEEMINDER_CLIENT_ID=[ditto]
+    BEEMINDER_CLIENT_NAME=[also ditto]
     BASE_URL=http://localhost:3000/
     DATABASE_URL=postgres:///webglue
 
