@@ -142,4 +142,5 @@
    (-> public-api-routes
        (json/wrap-json-response)
        (wrap-defaults api-defaults))
-   (wrap-defaults app-routes site-defaults)))
+   ;; not worth the time to get CSRF to work properly right now
+   (wrap-defaults app-routes (assoc-in site-defaults [:security :anti-forgery] false))))
