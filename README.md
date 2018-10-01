@@ -46,6 +46,10 @@ or to roll back (warning: lossy):
 3. Set BASE_URL to the ngrok url and run `lein ring server-headless`
 4. Go to the ngrok url
 
+### to run migrations on heroku
+
+    $ heroku run -a web-glue -- lein migrate
+
 ## Relevant documentation
 
 https://blog.beeminder.com/autofetch
