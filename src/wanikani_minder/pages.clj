@@ -1,7 +1,6 @@
 (ns wanikani-minder.pages
   (:require [hiccup.core :refer [html]]
-            ;; this is turned off for now; not worth the effort
-            #_[ring.util.anti-forgery :as ring-af]))
+            [ring.util.anti-forgery :as ring-af]))
 
 (defn logged-out-homepage
   [beeminder-authorize-url]
@@ -16,8 +15,7 @@
          [:h1 "WaniKani Minder"]
          [:p "Welcome, " beeminder-id]
          [:form {:method :post}
-          ;; this is turned off for now; not worth the effort
-          ;; (ring-af/anti-forgery-field)
+          (ring-af/anti-forgery-field)
           [:p [:label {:for "wanikani-api-key"} "WaniKani API key: "]
            [:input {:type :text :id "wanikani-api-key" :name "wanikani-api-key"}]
            " currently " (if wanikani-api-key wanikani-api-key "unset")

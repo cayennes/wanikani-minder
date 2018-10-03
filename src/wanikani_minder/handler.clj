@@ -102,7 +102,7 @@
 
 ;; # handlers
 
-(defroutes app-routes
+(defroutes site-routes
   ;; new
   (GET "/" {session :session} (homepage session))
   (POST "/"  [wanikani-api-key beeminder-goal-slug :as {:keys [session]}]
@@ -132,15 +132,13 @@
        (n-word-string (maintained-progress wanikani-key)))
   (route/not-found (pages/error "not found" "No page found with this URL")))
 
-(defroutes public-api-routes
+(defroutes api-routes
   (POST "/hooks/beeminder/autofetch" [username slug]
         (add-datapoint username slug)
         (response/response {:result "success"})))
 
 (def app
-  (routes
-   (-> public-api-routes
-       (json/wrap-json-response)
-       (wrap-defaults api-defaults))
-   ;; not worth the time to get CSRF to work properly right now
-   (wrap-defaults app-routes (assoc-in site-defaults [:security :anti-forgery] false))))
+  (-> (routes api-routes
+              (wrap-defaults site-routes site-defaults))
+      (json/wrap-json-response)
+      (wrap-defaults api-defaults)))
