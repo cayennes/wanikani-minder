@@ -14,6 +14,8 @@
   (html [:div
          [:h1 "WaniKani Minder"]
          [:p "Welcome, " beeminder-id]
+         [:p [:a {:href "/auth/logout"} "Log out"]]
+         [:h2 "WaniKani settings"]
          [:form {:method :post}
           (ring-af/anti-forgery-field)
           [:p [:label {:for "wanikani-api-key"} "WaniKani API key: "]
@@ -21,11 +23,9 @@
            " currently " (if wanikani-api-key wanikani-api-key "unset")
            [:br]
            "You can find this in " [:a {:href "https://www.wanikani.com/settings/account"} "WaniKani's settings"]]
-          [:p [:label {:for "beeminder-goal-slug"} "Beeminder goal name: "]
-           [:input {:type :text :id "beeminder-goal-slug" :name "beeminder-goal-slug"}]
-           " currently " (if beeminder-goal-slug beeminder-goal-slug "unset")]
           [:p [:button {:type :submit} "Update"]]]
-         [:p [:a {:href "/auth/logout"} "Log out"]]]))
+         [:h2 "Create beeminder goal"]
+         [:p "Coming soon: the ability to create a WaniKani maintained progress goal"]]))
 
 (defn error
   [error error-description]
