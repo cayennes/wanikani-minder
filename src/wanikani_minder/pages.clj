@@ -10,7 +10,7 @@
          [:p [:a {:href beeminder-authorize-url} "Login via beeminder"]]]))
 
 (defn logged-in-homepage
-  [{:keys [beeminder-id wanikani-api-key beeminder-goal-slug]}]
+  [{:keys [beeminder-id wanikani-api-key]}]
   (html [:div
          [:h1 "WaniKani Minder"]
          [:p "Welcome, " beeminder-id]

@@ -22,16 +22,9 @@
    {:beeminder_id beeminder-username
     :wanikani_api_key wanikani-api-key}))
 
-(defn update-beeminder-goal-slug! [beeminder-username beeminder-goal-slug]
-  (update-beeminder-goal-slug!*
-   db
-   {:beeminder_id beeminder-username
-    :beeminder_goal_slug beeminder-goal-slug}))
-
 (defn get
   [beeminder-username]
   (-> (get* db {:beeminder_id beeminder-username})
       (rename-keys {:beeminder_id :beeminder-id
                     :beeminder_access_token :beeminder-access-token
-                    :beeminder_goal_slug :beeminder-goal-slug
                     :wanikani_api_key :wanikani-api-key})))

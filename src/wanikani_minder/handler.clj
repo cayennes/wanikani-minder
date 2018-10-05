@@ -73,14 +73,6 @@
   [session]
   (update (response/redirect "/") :session dissoc :beeminder))
 
-(defn set-beeminder-goal
-  [session new-goal]
-  (let [user (user/get (get-in session [:beeminder :username]))]
-    ;; register with beeminder as the handler for the new goal
-    (beeminder/register-autofetch user new-goal)
-    ;; store new value to database
-    (user/update-beeminder-goal-slug! (:beeminder-username user) new-goal)))
-
 (defn add-datapoint
   [beeminder-username slug]
   ;; TODO: check that the user does actually have that goal configured
@@ -105,12 +97,10 @@
 (defroutes site-routes
   ;; new
   (GET "/" {session :session} (homepage session))
-  (POST "/"  [wanikani-api-key beeminder-goal-slug :as {:keys [session]}]
+  (POST "/"  [wanikani-api-key :as {:keys [session]}]
         (let [beeminder-username (get-in session [:beeminder :username])]
           (when (not-empty wanikani-api-key)
             (user/update-wanikani-token! beeminder-username wanikani-api-key))
-          (when (not-empty beeminder-goal-slug)
-            (set-beeminder-goal session beeminder-goal-slug))
           (homepage session)))
   (GET "/auth/beeminder/callback" [access_token username error error_description
                                    :as {session :session}]
