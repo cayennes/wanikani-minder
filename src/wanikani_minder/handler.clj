@@ -58,9 +58,9 @@
        "&response_type=token"))
 
 (defn homepage
-  [session]
-  (if-let [username (get-in session [:beeminder :username])]
-    (pages/logged-in-homepage (user/get username))
+  [session data]
+  (if-let [beeminder-username (-> (get-in session [:beeminder :username]))]
+    (pages/logged-in-homepage (user/get beeminder-username) data)
     (pages/logged-out-homepage (authorize-url))))
 
 (defn login
@@ -82,6 +82,16 @@
                   maintained-progress)]
     (beeminder/add-datapoint user slug {:value value})))
 
+(defn create-goal
+  [beeminder-username {:keys [slug rate]}]
+  (let [user (user/get beeminder-username)
+        current-progress (-> user :wanikani-api-key maintained-progress)]
+    (beeminder/create-wanikani-minder-goal
+     user
+     {:slug slug
+      :rate rate
+      :start-value current-progress})))
+
 ;; # legacy urlminder hack
 
 ;; make urlminder pages
@@ -96,12 +106,22 @@
 
 (defroutes site-routes
   ;; new
-  (GET "/" {session :session} (homepage session))
-  (POST "/"  [wanikani-api-key :as {:keys [session]}]
-        (let [beeminder-username (get-in session [:beeminder :username])]
-          (when (not-empty wanikani-api-key)
-            (user/update-wanikani-token! beeminder-username wanikani-api-key))
-          (homepage session)))
+  (GET "/" {session :session} (homepage session nil))
+  (POST "/" {{{beeminder-username :username} :beeminder :as session} :session
+             {:keys [action] :as params} :params}
+        (println params)
+        (println "Action: " action)
+        (homepage session
+                  (case action
+                    "wanikani" (do (user/update-wanikani-token! beeminder-username
+                                                                (:wanikani-api-key params))
+                                   nil)
+                    "create-goal" (if-let [errors (create-goal beeminder-username params)]
+                                    {:create-goal {:errors errors
+                                                   :success false}}
+                                    {:create-goal {:success true
+                                                   :slug (:slug params)}})
+                    nil)))
   (GET "/auth/beeminder/callback" [access_token username error error_description
                                    :as {session :session}]
        (if-not error

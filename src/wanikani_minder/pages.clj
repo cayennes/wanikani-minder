@@ -1,5 +1,6 @@
 (ns wanikani-minder.pages
-  (:require [hiccup.core :refer [html]]
+  (:require [clojure.string :as string]
+            [hiccup.core :refer [html]]
             [ring.util.anti-forgery :as ring-af]))
 
 (defn logged-out-homepage
@@ -9,8 +10,17 @@
          [:p "Automatically beemind WaniKani progress"]
          [:p [:a {:href beeminder-authorize-url} "Login via beeminder"]]]))
 
+(defn error-span
+  [message]
+  [:span {:style "color:red"}
+   "Error: "
+   (if (string? message)
+     message
+     (string/join ", " message))])
+
 (defn logged-in-homepage
-  [{:keys [beeminder-id wanikani-api-key]}]
+  [{:keys [beeminder-id wanikani-api-key]}
+   {:keys [create-goal]}]
   (html [:div
          [:h1 "WaniKani Minder"]
          [:p "Welcome, " beeminder-id]
@@ -18,14 +28,30 @@
          [:h2 "WaniKani settings"]
          [:form {:method :post}
           (ring-af/anti-forgery-field)
-          [:p [:label {:for "wanikani-api-key"} "WaniKani API key: "]
+          [:p [:label {:for "wanikani-api-key"} "WaniKani v1 API key: "]
            [:input {:type :text :id "wanikani-api-key" :name "wanikani-api-key"}]
            " currently " (if wanikani-api-key wanikani-api-key "unset")
            [:br]
            "You can find this in " [:a {:href "https://www.wanikani.com/settings/account"} "WaniKani's settings"]]
-          [:p [:button {:type :submit} "Update"]]]
-         [:h2 "Create beeminder goal"]
-         [:p "Coming soon: the ability to create a WaniKani maintained progress goal"]]))
+          [:p [:button {:type :submit :name "action" :value "wanikani"} "Update"]]]
+         [:h2 "Create Beeminder goal"]
+         (if-not wanikani-api-key
+           [:p "You must have a WaniKani API key set in order to create a goal."]
+           [:form {:method :post}
+            (if-let [e (:unexpected (:errors create-goal))]
+              [:p (error-span (str "Unexpected error creating goal: " e))])
+            (if (:success create-goal)
+              [:p {:style "color:green"} "Created goal " (:slug create-goal)])
+            (ring-af/anti-forgery-field)
+            [:p [:label {:for "slug"} "Goal name: "]
+             [:input {:type :text :id "slug" :name "slug"}]
+             " "
+             (if-let [e (:slug (:errors create-goal))] (error-span e))]
+            [:p [:label {:for "rate"} "Daily rate: "]
+             [:input {:type :text :id "rate" :name "rate"}]
+             " "
+             (if-let [e (:rate (:errors create-goal))] (error-span e))]
+            [:p [:button {:type :submit :name "action" :value "create-goal"} "Create"]]])]))
 
 (defn error
   [error error-description]
