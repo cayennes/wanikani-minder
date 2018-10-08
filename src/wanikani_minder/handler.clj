@@ -107,16 +107,6 @@
       :rate rate
       :start-value current-progress})))
 
-;; # legacy urlminder hack
-
-;; make urlminder pages
-
-(defn n-word-string
-  [n]
-  (->> (cons n (repeat "w"))
-       (take n)
-       (clojure.string/join " ")))
-
 ;; # handlers
 
 (defroutes site-routes
@@ -146,18 +136,6 @@
          (login session access_token username)
          (pages/error error error_description)))
   (GET "/auth/logout" {session :session} (logout session))
-  ;; old
-  (GET "/wanikani-urlminder" [] (pages/legacy-intro))
-  (GET "/wanikani-urlminder/user/:wanikani-key/backlog-reduction-from/:starting-due"
-       [wanikani-key starting-due]
-       (n-word-string (- (Integer/parseInt starting-due)
-                         (get-due-count wanikani-key))))
-  (GET "/wanikani-urlminder/user/:wanikani-key/total-studied"
-       [wanikani-key]
-       (n-word-string (get-total wanikani-key)))
-  (GET "/wanikani-urlminder/user/:wanikani-key/maintained-progress"
-       [wanikani-key]
-       (n-word-string (maintained-progress wanikani-key)))
   (route/not-found (pages/error "not found" "No page found with this URL")))
 
 (defroutes api-routes
