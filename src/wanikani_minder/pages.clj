@@ -20,13 +20,18 @@
 
 (defn logged-in-homepage
   [{:keys [beeminder-id wanikani-api-key]}
-   {:keys [create-goal]}]
+   {:keys [create-goal wanikani]}]
   (html [:div
          [:h1 "WaniKani Minder"]
          [:p "Welcome, " beeminder-id]
          [:p [:a {:href "/auth/logout"} "Log out"]]
          [:h2 "WaniKani settings"]
          [:form {:method :post}
+          (if-let [username (:username wanikani)]
+            [:p {:style "color:green"} "Stored token for WaniKani user " username])
+          (if-let [e (:error wanikani)]
+            [:p (error-span (str "Invalid token. Are you sure it is your current API v1 token? Got error: "
+                                 e))])
           (ring-af/anti-forgery-field)
           [:p [:label {:for "wanikani-api-key"} "WaniKani v1 API key: "]
            [:input {:type :text :id "wanikani-api-key" :name "wanikani-api-key"}]

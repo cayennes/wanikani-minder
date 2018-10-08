@@ -24,6 +24,10 @@
   [wanikani-key]
   (format "https://www.wanikani.com/api/v1/user/%s/srs-distribution" wanikani-key))
 
+(defn user-information-url
+  [wanikani-key]
+  (format "https://www.wanikani.com/api/v1/user/%s/user-information" wanikani-key))
+
 (defn get-due-count
   [wanikani-key]
   (get-in (client/get (study-queue-url wanikani-key)
@@ -43,6 +47,17 @@
 (defn maintained-progress
   [wanikani-key]
   (- (get-total wanikani-key) (get-due-count wanikani-key)))
+
+(defn get-username-or-error
+  [wanikani-key]
+  (let [result (client/get (user-information-url wanikani-key)
+                           {:as :json
+                            :throw-exceptions false})]
+    (if-let [username (get-in result [:body :user_information :username])]
+      {:username username
+       :success true}
+      {:error (str "status " (:status result))
+       :success false})))
 
 ;; auth
 
@@ -109,13 +124,16 @@
   (GET "/" {session :session} (homepage session nil))
   (POST "/" {{{beeminder-username :username} :beeminder :as session} :session
              {:keys [action] :as params} :params}
-        (println params)
-        (println "Action: " action)
         (homepage session
                   (case action
-                    "wanikani" (do (user/update-wanikani-token! beeminder-username
-                                                                (:wanikani-api-key params))
-                                   nil)
+                    "wanikani" (let [wanikani-api-key (:wanikani-api-key params)
+                                     key-check (get-username-or-error wanikani-api-key)]
+                                 (if (:success key-check)
+                                   (do
+                                     (user/update-wanikani-token! beeminder-username
+                                                                  wanikani-api-key)
+                                     {:wanikani {:username (:username key-check)}})
+                                   {:wanikani {:error (:error key-check)}}))
                     "create-goal" (if-let [errors (create-goal beeminder-username params)]
                                     {:create-goal {:errors errors
                                                    :success false}}
