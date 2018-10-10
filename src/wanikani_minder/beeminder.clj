@@ -56,8 +56,7 @@
                  {:rate rate-error})
                (if-let [unexpected (not-empty (dissoc errors :slug :rfin))]
                  {:unexpected unexpected}))
-        (let [update-result (->> {:odom true
-                                  :aggday "max"
+        (let [update-result (->> {:aggday "max"
                                   :kyoom false
                                   :integery true}
                                  (update-goal user slug))]
