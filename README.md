@@ -56,31 +56,3 @@ or to roll back (warning: lossy):
 https://blog.beeminder.com/autofetch
 https://www.wanikani.com/api - current API which this uses; there is a v2 in open alpha
 
-## Roadmap
-
-### Beeminder WaniKani integration using new 3rd party Beeminder integration paradigm
-
-Necessary
-
-- [x] beeminder oauth login
-- [x] store beeminder login in the DB
-- [x] ability to enter and store WaniKani API token
-- [ ] ability to link to beeminder goals 
-- [ ] implement the endpoint that will report data to Beeminder
-
-Maybe necessary
-- [ ] store what stat to use for the goal in the db
-
-Bonus
-
-- [ ] proper errors of some kind when anything goes wrong
-- [ ] endpoint for when goal gets deleted or such
-- [ ] create goals from my end
-
-### Misc.
-
-- [ ] continuous deployment
-
-### Some nice way to combine anki and beeminder data
-
-point an anki addon at this service. store both anki and beeminder data.  report the sum to beeminder.
