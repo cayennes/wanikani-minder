@@ -1,6 +1,6 @@
-# TODO: give this project a name
+# WaniKani Minder
 
-This is currently a beeminder/wanikani integration and I expect it to include other beeminder related or similar things in the future/  It has been named things overly specific and overly general in the past.
+This is a Beeminder/WaniKani integration
 
 ## Development
 
