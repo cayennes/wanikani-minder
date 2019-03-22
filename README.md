@@ -12,7 +12,7 @@ The following software must be installed:
 * postgresql
 * for deployment - heroku cli
 
-A postgres database - webglue by default, can configure something else though
+You'll need to create the wanikani_minder database (you can also name it something else and change the DATABASE_URL configuration)
 
 Register a dev app on beeminder
 
@@ -22,11 +22,12 @@ A .env file containing
     BEEMINDER_CLIENT_ID=[ditto]
     BEEMINDER_CLIENT_NAME=[also ditto]
     BASE_URL=http://localhost:3000/
-    DATABASE_URL=postgres:///webglue
+    DATABASE_URL=postgres:///wanikani_minder
 
 ### to run
 
-    $ set -a; source .env; set +a
+    $ set -a; source .env; set +a  # any new shell
+    $ lein migrate                 # first time or after adding a migration
     $ lein ring server
 
 ### database migrations
