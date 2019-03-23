@@ -1,14 +1,14 @@
 -- :name beeminder-create-or-update!*
 -- :command :execute
 -- :result :n
-INSERT INTO web_glue_user (beeminder_id, beeminder_access_token)
+INSERT INTO wanikani_minder_user (beeminder_id, beeminder_access_token)
 VALUES (:beeminder_id, :beeminder_access_token)
 ON CONFLICT (beeminder_id) DO UPDATE
 SET beeminder_access_token = :beeminder_access_token;
 
 -- :name update-wanikani-api-key!*
 -- :command :execute
-UPDATE web_glue_user
+UPDATE wanikani_minder_user
 SET wanikani_api_key = :wanikani_api_key
 WHERE beeminder_id = :beeminder_id;
 
@@ -18,7 +18,7 @@ WHERE beeminder_id = :beeminder_id;
 SELECT beeminder_id,
        beeminder_access_token,
        wanikani_api_key
-  FROM web_glue_user
+  FROM wanikani_minder_user
   WHERE beeminder_id = :beeminder_id;
 
 

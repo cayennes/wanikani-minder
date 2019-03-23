@@ -49,7 +49,7 @@ or to roll back (warning: lossy):
 
 ### to run migrations on heroku
 
-    $ heroku run -a web-glue -- lein migrate
+    $ heroku run -a [app name] -- lein migrate
 
 ## Relevant documentation
 
