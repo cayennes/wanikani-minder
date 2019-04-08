@@ -36,8 +36,7 @@
                :throw-exceptions false}))
 
 (defn create-wanikani-minder-goal
-  [user
-   {:keys [slug rate start-value]}]
+  [user {:keys [slug rate start-value]}]
   (if-let [errors (not-empty (merge (if-not (not-empty slug) {:slug "Required"})
                                     (if-not (not-empty rate) {:rate "Required"})
                                     (if-not start-value {:unexpected "Could not determine start value"})))]
@@ -59,9 +58,11 @@
         (let [update-result (->> {:aggday "max"
                                   :kyoom false
                                   :integery true}
-                                 (update-goal user slug))]
+                                 (update-goal user slug)
+                                 :body)]
           (if-let [errors (:errors update-result)]
-            {:unexpected errors}))))))
+            {:unexpected errors}
+            update-result))))))
 
 ;; things below here are currently tools for the repl rather than used by the app
 ;; get a user in repl with (wanikani-minder.db.user/get "beeminder-username")
@@ -89,7 +90,9 @@
   (client/put (str api-url "/users/me/goals/" goal ".json")
               {:form-params (merge data
                                    {"access_token" beeminder-access-token})
-               :redirect-strategy :lax}))
+               :redirect-strategy :lax
+               :as :json
+               :coerce :always}))
 
 (defn register-autofetch
   [user goal]

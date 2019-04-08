@@ -15,7 +15,8 @@ WHERE beeminder_id = :beeminder_id;
 -- :name get*
 -- :command :query
 -- :result :1
-SELECT beeminder_id,
+SELECT id,
+       beeminder_id,
        beeminder_access_token,
        wanikani_api_key
   FROM wanikani_minder_user

@@ -9,6 +9,7 @@
             [wanikani-minder.beeminder :as beeminder]
             [wanikani-minder.config :refer [config]]
             [wanikani-minder.pages :as pages]
+            [wanikani-minder.db.goal :as goal]
             [wanikani-minder.db.user :as user]))
 
 ;; # stuff
@@ -101,11 +102,15 @@
   [beeminder-username {:keys [slug rate]}]
   (let [user (user/get beeminder-username)
         current-progress (-> user :wanikani-api-key maintained-progress)]
-    (beeminder/create-wanikani-minder-goal
-     user
-     {:slug slug
-      :rate rate
-      :start-value current-progress})))
+    (let [res (beeminder/create-wanikani-minder-goal
+               user
+               {:slug slug
+                :rate rate
+                :start-value current-progress})]
+      (if (:errors res)
+        res
+        (do (goal/create! user slug (:id res))
+            nil)))))
 
 ;; # handlers
 
