@@ -15,7 +15,8 @@ UPDATE goal
 -- :command :query
 -- :result :one
 SELECT beminder_slug,
-       beeminder_id
+       beeminder_id,
+       id
   FROM goal
   WHERE beeminder_slug = :beeminder_slug
   AND wanikani_minder_user = :wanikani_minder_user;
@@ -24,7 +25,8 @@ SELECT beminder_slug,
 -- :command :query
 -- :result :one
 SELECT beminder_slug,
-       beeminder_id
+       beeminder_id,
+       id
   FROM goal
   WHERE beeminder_id = :beeminder_id
   AND wanikani_minder_user = :wanikani_minder_user;
@@ -33,6 +35,13 @@ SELECT beminder_slug,
 -- :command :query
 -- :result :many
 SELECT beeminder_slug,
-       beeminder_id
+       beeminder_id,
+       id
   FROM goal
   WHERE wanikani_minder_user = :wanikani_minder_user;
+
+-- :name delete!*
+-- :command :execute
+-- :result :affected
+DELETE FROM goal
+  WHERE id = :id;

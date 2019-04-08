@@ -42,3 +42,7 @@
   [user]
   (->> (get-by-user* db {:wanikani_minder_user (:id user)})
        (map app-facing-keys)))
+
+(defn delete!
+  [goal]
+  (delete!* db goal))
