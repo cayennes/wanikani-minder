@@ -4,10 +4,6 @@
             [ring.mock.request :as mock]
             [clj-http.client :as client]))
 
-(deftest make-n-word-string-works
-  (is (= "5 w w w w" (handler/n-word-string 5)))
-  (is (= "" (handler/n-word-string 0))))
-
 (deftest routes-return-success
   (with-redefs [handler/get-total (constantly 17)
                 handler/get-due-count (constantly 4)
