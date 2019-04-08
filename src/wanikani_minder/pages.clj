@@ -43,7 +43,7 @@
            [:input {:type :text :id "wanikani-api-key" :name "wanikani-api-key"}]
            " currently " (if wanikani-api-key wanikani-api-key "unset")
            [:br]
-           "You can find this in " [:a {:href "https://www.wanikani.com/settings/account"} "WaniKani's settings"]]
+           "You can find this at the bottom of " [:a {:href "https://www.wanikani.com/settings/personal_access_tokens"} "this page in your WaniKani's settings"]]
           [:p [:button {:type :submit :name "action" :value "wanikani"} "Update"]]]
          [:h2 "Create Beeminder goal"]
          (if-not wanikani-api-key
