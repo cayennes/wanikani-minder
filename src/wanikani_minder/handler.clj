@@ -2,6 +2,7 @@
   (:require [compojure.core :refer [routes defroutes GET POST]]
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults site-defaults]]
+            [ring.logger :as logger]
             [ring.util.codec :refer [url-encode]]
             [ring.util.response :as response]
             [ring.middleware.json :as json]
@@ -148,8 +149,13 @@
         (add-datapoint username slug)
         (response/response {:result "success"})))
 
+(def redact-keys
+  "the defaults plus access_token"
+  #{:access_token :authorization :password :token :secret :secret-key :secret-token})
+
 (def app
   (-> (routes api-routes
               (wrap-defaults site-routes site-defaults))
+      (logger/wrap-with-logger {:redact-key? redact-keys})
       (json/wrap-json-response)
       (wrap-defaults api-defaults)))
