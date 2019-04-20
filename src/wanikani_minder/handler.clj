@@ -1,5 +1,6 @@
 (ns wanikani-minder.handler
-  (:require [compojure.core :refer [routes defroutes GET POST]]
+  (:require [clojure.tools.logging :as log]
+            [compojure.core :refer [routes defroutes GET POST]]
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults site-defaults]]
             [ring.logger :as logger]
@@ -93,6 +94,8 @@
 (defn add-datapoint
   [beeminder-username slug]
   ;; TODO: check that the user does actually have that goal configured
+  (log/info "Adding a datapoint"
+            {:beeminder-username beeminder-username :slug slug})
   (let [user (user/get beeminder-username)
         value (-> user
                   :wanikani-api-key
