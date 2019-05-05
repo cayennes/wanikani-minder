@@ -10,7 +10,7 @@ The following software must be installed:
 
 * leiningen
 * postgresql
-* for deployment - heroku cli
+* optional: for deployment - heroku cli
 
 You'll need to create the wanikani_minder database (you can also name it something else and change the DATABASE_URL configuration)
 
@@ -49,7 +49,14 @@ or to roll back (warning: lossy):
 3. Set BASE_URL to the ngrok url (with trailing slash) and run `lein ring server-headless`
 4. Go to the ngrok url, set up a goal
 
-### to run migrations on heroku
+### running on heroku
+
+* create an app on heroku, with a postgres db
+* create an app on beeminder - set it up similar to the testing webhooks locally, but using your heroku app's url
+* set up the heroku app's environment variables to have similar valus to the .env documented above
+* push the code to heroku
+
+to run migrations on heroku:
 
     $ heroku run -a [app name] -- lein migrate
 
