@@ -40,12 +40,14 @@ or to roll back (warning: lossy):
     
 ### to test webhooks locally
 
-[Install](https://dashboard.ngrok.com/get-started) [ngrok](https://ngrok.com) if it isn't already
+[Install](https://dashboard.ngrok.com/get-started) [ngrok](https://ngrok.com) if you don't have it installed already
 
-1. `ngrok http 3000`
-2. Go to the settings for the dev app on beeminder, and update the URLs to use the ngrok url (with trailing slash for autofetch) instead of localhost - TODO: exactly what these URLs should be
+1. Run `ngrok http 3000`
+2. Go to the settings for the dev app on beeminder, and update the URLs to use the ngrok url instead of localhost
+   - Redirect URL: https://some_hex_string.ngrok.io/auth/beeminder/callback
+   - Autofetch Callback URL: https://some_hex_string.ngrok.io/hooks/beeminder/autofetch
 3. Set BASE_URL to the ngrok url (with trailing slash) and run `lein ring server-headless`
-4. Go to the ngrok url
+4. Go to the ngrok url, set up a goal
 
 ### to run migrations on heroku
 
