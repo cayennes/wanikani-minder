@@ -4,17 +4,16 @@
 INSERT INTO goal (wanikani_minder_user, beeminder_slug, beeminder_id)
   VALUES (:wanikani_minder_user, :beeminder_slug, :beeminder_id);
 
--- :name update-beeminder-slug*
+-- :name update-beeminder-slug!*
 -- :command :execute
 UPDATE goal
   SET beeminder_slug = beeminder_slug;
-  WHERE beeminder_id = :beeminder_id
-    AND wanikani_minder_user = :wanikani_minder_user;
+  WHERE id = :id;
 
 -- :name get-by-beeminder-slug*
 -- :command :query
 -- :result :one
-SELECT beminder_slug,
+SELECT beeminder_slug,
        beeminder_id,
        id
   FROM goal
@@ -24,7 +23,7 @@ SELECT beminder_slug,
 -- :name get-by-beeminder-id*
 -- :command :query
 -- :result :one
-SELECT beminder_slug,
+SELECT beeminder_slug,
        beeminder_id,
        id
   FROM goal

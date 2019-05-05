@@ -91,15 +91,34 @@
   [session]
   (update (response/redirect "/") :session dissoc :beeminder))
 
+(defn get-configured-goal
+  "if the goal is configred, return it even if it has a new slug name"
+  [user goal-slug]
+  (if-let [goal-with-slug-in-db (goal/get-by-beeminder-slug user goal-slug)]
+    goal-with-slug-in-db
+    (let [beeminder-goal (beeminder/goal-info user goal-slug)]
+      (first (for [goal (goal/get-by-user user)
+                   :when (= (:id beeminder-goal)
+                            (:beeminder-id goal))]
+               goal)))))
+
 (defn add-datapoint
   [beeminder-username slug]
-  ;; TODO: check that the user does actually have that goal configured
   (log/info "Adding a datapoint"
             {:beeminder-username beeminder-username :slug slug})
   (let [user (user/get beeminder-username)
         value (-> user
                   :wanikani-api-key
                   maintained-progress)]
+    (if-let [goal (get-configured-goal user slug)]
+      ;; if the slug has changed, updated it
+      (when (not= slug (:beeminder-slug goal))
+        (goal/update-beeminder-slug! goal slug))
+      ;; if we couldn't get the goal, log an error message
+      (log/info "Goot hook for goal that wasn't set up with WaniKani Minder"
+                {:beeminder-username beeminder-username :slug slug}))
+    ;; currently add the datapoint in all cases, but after this is confirmed to
+    ;; work move this ito the success case of getting the goal
     (beeminder/add-datapoint user slug {:value value})))
 
 (defn create-goal

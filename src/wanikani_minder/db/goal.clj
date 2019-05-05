@@ -22,6 +22,12 @@
              :beeminder_slug beeminder-slug
              :beeminder_id beeminder-id}))
 
+(defn update-beeminder-slug!
+  [goal slug]
+  (update-beeminder-slug!* db
+                           {:id (:id goal)
+                            :beeminder_slug slug}))
+
 (defn get-by-beeminder-slug
   [user beeminder-slug]
   (-> (get-by-beeminder-slug*
