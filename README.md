@@ -1,6 +1,8 @@
 # WaniKani Minder
 
-This is a Beeminder/WaniKani integration
+This is a Beeminder/WaniKani integration.
+
+If you just want to use it, there is an instance running at https://web-glue.herokuapp.com/ . See there for more info on what it does.
 
 ## Development
 
