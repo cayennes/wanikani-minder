@@ -64,6 +64,6 @@ to run migrations on heroku:
 
 ## Relevant documentation
 
-https://blog.beeminder.com/autofetch
-https://www.wanikani.com/api - current API which this uses; there is a v2 in open alpha
+* https://blog.beeminder.com/autofetch
+* https://www.wanikani.com/api - current API which this uses; there is a v2 in open alpha
 
