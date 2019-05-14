@@ -111,15 +111,18 @@
                   :wanikani-api-key
                   maintained-progress)]
     (if-let [goal (get-configured-goal user slug)]
-      ;; if the slug has changed, updated it
-      (when (not= slug (:beeminder-slug goal))
-        (goal/update-beeminder-slug! goal slug))
-      ;; if we couldn't get the goal, log an error message
-      (log/info "Goot hook for goal that wasn't set up with WaniKani Minder"
-                {:beeminder-username beeminder-username :slug slug}))
-    ;; currently add the datapoint in all cases, but after this is confirmed to
-    ;; work move this ito the success case of getting the goal
-    (beeminder/add-datapoint user slug {:value value})))
+      (do
+        ;; add the datapoint
+        (beeminder/add-datapoint user slug {:value value})
+        ;; if the slug has changed, updated it
+        (when (not= slug (:beeminder-slug goal))
+          (goal/update-beeminder-slug! goal slug))
+        true)
+      ;; if we couldn't get the goal, log an error message, and do not update
+      (do
+        (log/info "Goot hook for goal that wasn't set up with WaniKani Minder"
+                  {:beeminder-username beeminder-username :slug slug})
+        false))))
 
 (defn create-goal
   [beeminder-username {:keys [slug rate]}]
@@ -168,8 +171,11 @@
 
 (defroutes api-routes
   (POST "/hooks/beeminder/autofetch" [username slug]
-        (add-datapoint username slug)
-        (response/response {:result "success"})))
+        (if-let [_res (add-datapoint username slug)]
+          (response/response {:success true})
+          (-> {:success false :error "tried to update goal not managed by this app"}
+              (response/response)
+              (response/status 400)))))
 
 (def redact-keys
   "the defaults plus access_token"
