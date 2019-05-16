@@ -7,6 +7,9 @@
 ;; see http://mcramm.com/post/integration-tests-for-clojure-and-postgres/ for
 ;; one good approach when it would be useful to add smoke tests that interact
 ;; with the database.
+;;
+;; when doing that, switch to running with circleci.test so that we can run
+;; individual tests with fixtures
 
 (deftest homepage-returns-success
   (with-redefs [client/get (fn [& _] (assert false "no internet allowed"))
