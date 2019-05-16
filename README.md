@@ -51,6 +51,12 @@ or to roll back (warning: lossy):
 3. Set BASE_URL to the ngrok url (with trailing slash) and run `lein ring server-headless`
 4. Go to the ngrok url, set up a goal
 
+### unit tests
+
+There aren't yet much in the way of unit tests (that would be great to fix) but what there is can be run with
+
+    $ lein test
+
 ### running on heroku
 
 * create an app on heroku, with a postgres db
