@@ -7,7 +7,9 @@
 
 (hugsql/def-db-fns "wanikani_minder/db/sql/user.sql")
 
-(def db {:connection-uri (to-jdbc-uri.core/to-jdbc-uri (:database-url config))})
+(def db
+  (if-let [db-url (:database-url config)]
+    {:connection-uri (to-jdbc-uri.core/to-jdbc-uri db-url)}))
 
 (defn beeminder-create-or-update! [{:keys [username access-token]}]
   "store user"
