@@ -171,11 +171,12 @@
 
 (defroutes api-routes
   (POST "/hooks/beeminder/autofetch" [username slug]
-        (if-let [_res (add-datapoint username slug)]
-          (response/response {:success true})
-          (-> {:success false :error "tried to update goal not managed by this app"}
-              (response/response)
-              (response/status 400)))))
+        (if (add-datapoint username slug)
+          {:body {:success true}
+           :status 200}
+          {:body {:success false
+                  :error "tried to update goal not managed by this app"}
+           :status 400})))
 
 (def redact-keys
   "the defaults plus access_token"
