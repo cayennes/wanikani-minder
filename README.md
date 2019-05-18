@@ -51,7 +51,7 @@ or to roll back (warning: lossy):
 3. Set BASE_URL to the ngrok url (with trailing slash) and run `lein ring server-headless`
 4. Go to the ngrok url, set up a goal
 
-### unit tests
+### unit tests [![CircleCI](https://circleci.com/gh/cayennes/wanikani-minder.svg?style=svg&circle-token=7977aa018b93578a329828b495706cfa9ee7b5c3)](https://circleci.com/gh/cayennes/wanikani-minder)
 
 There aren't yet much in the way of unit tests (that would be great to fix) but what there is can be run with
 
