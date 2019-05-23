@@ -75,10 +75,40 @@
        "&redirect_uri=" (url-encode (redirect-uri))
        "&response_type=token"))
 
+(defn create-goal
+  [beeminder-username {:keys [slug rate]}]
+  (let [user (user/get beeminder-username)
+        current-progress (-> user :wanikani-api-key maintained-progress)]
+    (let [res (beeminder/create-wanikani-minder-goal
+               user
+               {:slug slug
+                :rate rate
+                :start-value current-progress})]
+      (if (:errors res)
+        res
+        (do (goal/create! user slug (:id res))
+            nil)))))
+
 (defn homepage
-  [session data]
-  (if-let [beeminder-username (-> (get-in session [:beeminder :username]))]
-    (pages/logged-in-homepage (user/get beeminder-username) data)
+  [{{beeminder-username :username} :beeminder :as session}
+   {:keys [action] :as params}]
+  (if beeminder-username
+    (let [data (case action
+                 "wanikani" (let [wanikani-api-key (:wanikani-api-key params)
+                                  key-check (get-username-or-error wanikani-api-key)]
+                              (if (:success key-check)
+                                (do
+                                  (user/update-wanikani-token! beeminder-username
+                                                               wanikani-api-key)
+                                  {:wanikani {:username (:username key-check)}})
+                                {:wanikani {:error (:error key-check)}}))
+                 "create-goal" (if-let [errors (create-goal beeminder-username params)]
+                                 {:create-goal {:errors errors
+                                                :success false}}
+                                 {:create-goal {:success true
+                                                :slug (:slug params)}})
+                 nil)]
+      (pages/logged-in-homepage (user/get beeminder-username) data))
     (pages/logged-out-homepage (authorize-url))))
 
 (defn login
@@ -124,43 +154,12 @@
                   {:beeminder-username beeminder-username :slug slug})
         false))))
 
-(defn create-goal
-  [beeminder-username {:keys [slug rate]}]
-  (let [user (user/get beeminder-username)
-        current-progress (-> user :wanikani-api-key maintained-progress)]
-    (let [res (beeminder/create-wanikani-minder-goal
-               user
-               {:slug slug
-                :rate rate
-                :start-value current-progress})]
-      (if (:errors res)
-        res
-        (do (goal/create! user slug (:id res))
-            nil)))))
-
 ;; # handlers
 
 (defroutes site-routes
   ;; new
   (GET "/" {session :session} (homepage session nil))
-  (POST "/" {{{beeminder-username :username} :beeminder :as session} :session
-             {:keys [action] :as params} :params}
-        (homepage session
-                  (case action
-                    "wanikani" (let [wanikani-api-key (:wanikani-api-key params)
-                                     key-check (get-username-or-error wanikani-api-key)]
-                                 (if (:success key-check)
-                                   (do
-                                     (user/update-wanikani-token! beeminder-username
-                                                                  wanikani-api-key)
-                                     {:wanikani {:username (:username key-check)}})
-                                   {:wanikani {:error (:error key-check)}}))
-                    "create-goal" (if-let [errors (create-goal beeminder-username params)]
-                                    {:create-goal {:errors errors
-                                                   :success false}}
-                                    {:create-goal {:success true
-                                                   :slug (:slug params)}})
-                    nil)))
+  (POST "/" {:keys [session params]} (homepage session params))
   (GET "/auth/beeminder/callback" [access_token username error error_description
                                    :as {session :session}]
        (if-not error
