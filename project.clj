@@ -23,8 +23,8 @@
          }
 
   :profiles
-  {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
-                        [ring/ring-mock "0.3.0"]]}}
+  {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]]}
+   :test {:dependencies [[peridot "0.5.1"]]}}
 
   :aliases {"migrate" ["run" "-m" "wanikani-minder.migrations/migrate"]
             "rollback" ["run" "-m" "wanikani-minder.migrations/rollback"]})
