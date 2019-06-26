@@ -1,15 +1,10 @@
-(ns wanikani-minder.test-handler
+(ns wanikani-minder.integration.smoke-test
+  "end to end tests of the very most basic functionality of the very most basic happy paths"
   (:require [wanikani-minder.handler :as handler]
             [wanikani-minder.db.user :as user]
             [clojure.test :refer (deftest is)]
             [peridot.core :as peridot]
             [clj-http.client :as client]))
-
-;; smoke tests
-;; TODO: move these to a new file
-
-;; these should be end to end tests of the very most basic functionality of the
-;; very most basic happy paths
 
 (deftest logged-out-homepage
   (with-redefs [client/get (fn [& _] (assert false "no internet allowed"))
