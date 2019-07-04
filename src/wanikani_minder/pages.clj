@@ -27,6 +27,7 @@
 
 (defn logged-in-homepage
   [{:keys [beeminder-id wanikani-api-key]}
+   {:keys [goals]}
    {:keys [create-goal wanikani]}]
   (html [:div
          [:h1 "WaniKani Minder"]
@@ -63,6 +64,9 @@
              " "
              (if-let [e (:rate (:errors create-goal))] (error-span e))]
             [:p [:button {:type :submit :name "action" :value "create-goal"} "Create"]]])
+         (when (some? goals)
+           [:p "You have created these goals with WaniKani Minder:"
+            [:ul (map (fn [g] [:li g]) goals)]])
          explanation]))
 
 (defn error

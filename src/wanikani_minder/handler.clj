@@ -93,22 +93,24 @@
   [{{beeminder-username :username} :beeminder :as session}
    {:keys [action] :as params}]
   (if beeminder-username
-    (let [data (case action
-                 "wanikani" (let [wanikani-api-key (:wanikani-api-key params)
-                                  key-check (get-username-or-error wanikani-api-key)]
-                              (if (:success key-check)
-                                (do
-                                  (user/update-wanikani-token! beeminder-username
-                                                               wanikani-api-key)
-                                  {:wanikani {:username (:username key-check)}})
-                                {:wanikani {:error (:error key-check)}}))
-                 "create-goal" (if-let [errors (create-goal beeminder-username params)]
-                                 {:create-goal {:errors errors
-                                                :success false}}
-                                 {:create-goal {:success true
-                                                :slug (:slug params)}})
-                 nil)]
-      (pages/logged-in-homepage (user/get beeminder-username) data))
+    (let [action-data (case action
+                        "wanikani" (let [wanikani-api-key (:wanikani-api-key params)
+                                         key-check (get-username-or-error wanikani-api-key)]
+                                     (if (:success key-check)
+                                       (do
+                                         (user/update-wanikani-token! beeminder-username
+                                                                      wanikani-api-key)
+                                         {:wanikani {:username (:username key-check)}})
+                                       {:wanikani {:error (:error key-check)}}))
+                        "create-goal" (if-let [errors (create-goal beeminder-username params)]
+                                        {:create-goal {:errors errors
+                                                       :success false}}
+                                        {:create-goal {:success true
+                                                       :slug (:slug params)}})
+                        nil)
+          user (user/get beeminder-username)
+          user-data {:goals (map :beeminder-slug (goal/get-by-user user))}]
+      (pages/logged-in-homepage user user-data action-data))
     (pages/logged-out-homepage (authorize-url))))
 
 (defn login
