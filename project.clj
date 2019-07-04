@@ -12,6 +12,7 @@
                  [cheshire "5.6.3"]
                  [hiccup "1.0.5"]
                  [org.postgresql/postgresql "42.2.2"]
+                 [peridot "0.5.1"] ;; TODO: not sure why this wasn't working in the test profile
                  [ragtime "0.7.1"]
                  [com.layerware/hugsql "0.4.8"]
                  [com.carouselapps/to-jdbc-uri "0.5.0"]]
@@ -23,8 +24,7 @@
          }
 
   :profiles
-  {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]]}
-   :test {:dependencies [[peridot "0.5.1"]]}}
+  {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]]}}
 
   :aliases {"migrate" ["run" "-m" "wanikani-minder.migrations/migrate"]
             "rollback" ["run" "-m" "wanikani-minder.migrations/rollback"]})
