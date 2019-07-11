@@ -12,19 +12,19 @@
                  [cheshire "5.6.3"]
                  [hiccup "1.0.5"]
                  [org.postgresql/postgresql "42.2.2"]
-                 [peridot "0.5.1"] ;; TODO: not sure why this wasn't working in the test profile
                  [ragtime "0.7.1"]
                  [com.layerware/hugsql "0.4.8"]
                  [com.carouselapps/to-jdbc-uri "0.5.0"]]
 
   :plugins [[lein-ring "0.9.7"]]
 
-  :ring {:handler wanikani-minder.handler/app
-         ;; :nrepl {:start? true}
-         }
+  :ring {:handler wanikani-minder.handler/app}
 
   :profiles
-  {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]]}}
+  {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
+                        [peridot "0.5.1"]]
+         :ring {:nrepl {:start? true}}}}
+
 
   :aliases {"migrate" ["run" "-m" "wanikani-minder.migrations/migrate"]
             "rollback" ["run" "-m" "wanikani-minder.migrations/rollback"]})
