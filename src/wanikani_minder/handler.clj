@@ -7,60 +7,21 @@
             [ring.util.codec :refer [url-encode]]
             [ring.util.response :as response]
             [ring.middleware.json :as json]
-            [clj-http.client :as client]
             [wanikani-minder.beeminder :as beeminder]
             [wanikani-minder.config :refer [config]]
             [wanikani-minder.pages :as pages]
             [wanikani-minder.db.goal :as goal]
-            [wanikani-minder.db.user :as user]))
+            [wanikani-minder.db.user :as user]
+            [wanikani-minder.wanikani :as wanikani]))
 
-;; # stuff
+;; # core
 
-;; wanikani access
-;; TODO: move to own namespace
-
-(defn study-queue-url
-  [wanikani-key]
-  (format "https://www.wanikani.com/api/v1/user/%s/study-queue" wanikani-key))
-
-(defn srs-distribution-url
-  [wanikani-key]
-  (format "https://www.wanikani.com/api/v1/user/%s/srs-distribution" wanikani-key))
-
-(defn user-information-url
-  [wanikani-key]
-  (format "https://www.wanikani.com/api/v1/user/%s/user-information" wanikani-key))
-
-(defn get-due-count
-  [wanikani-key]
-  (get-in (client/get (study-queue-url wanikani-key)
-                      {:as :json})
-          [:body :requested_information :reviews_available]))
-
-(defn get-total
-  [wanikani-key]
-  (->> (client/get (srs-distribution-url wanikani-key)
-                   {:as :json})
-       :body
-       :requested_information
-       vals
-       (map :total)
-       (apply +)))
+;; this is the entirety of core logic for this app
+;; not really worth a namespace
 
 (defn maintained-progress
   [wanikani-key]
-  (- (get-total wanikani-key) (get-due-count wanikani-key)))
-
-(defn get-username-or-error
-  [wanikani-key]
-  (let [result (client/get (user-information-url wanikani-key)
-                           {:as :json
-                            :throw-exceptions false})]
-    (if-let [username (get-in result [:body :user_information :username])]
-      {:username username
-       :success true}
-      {:error (str "status " (:status result))
-       :success false})))
+  (- (wanikani/get-total wanikani-key) (wanikani/get-due-count wanikani-key)))
 
 ;; auth
 
@@ -95,7 +56,7 @@
   (if beeminder-username
     (let [action-data (case action
                         "wanikani" (let [wanikani-api-key (:wanikani-api-key params)
-                                         key-check (get-username-or-error wanikani-api-key)]
+                                         key-check (wanikani/get-username-or-error wanikani-api-key)]
                                      (if (:success key-check)
                                        (do
                                          (user/update-wanikani-token! beeminder-username
