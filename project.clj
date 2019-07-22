@@ -8,7 +8,7 @@
                  [ring/ring-defaults "0.2.1"]
                  [ring/ring-json "0.4.0"]
                  [ring-logger "1.0.1"]
-                 [clj-http "3.6.1"]
+                 [clj-http "3.10.0"]
                  [cheshire "5.6.3"]
                  [hiccup "1.0.5"]
                  [org.postgresql/postgresql "42.2.2"]
