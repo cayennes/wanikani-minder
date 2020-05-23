@@ -1,5 +1,18 @@
 (ns wanikani-minder.wanikani
-  (:require [clj-http.client :as client]))
+  (:require [clj-http.client :as client]
+            [clojure.string :as string]))
+
+(defn api-key-version
+  [api-key & _args]
+  (if (string/includes? api-key "-")
+    :v2
+    :v1))
+
+(defmulti get-due-count api-key-version)
+(defmulti get-total api-key-version)
+(defmulti get-username-or-error api-key-version)
+
+;; v1 API
 
 (defn study-queue-url
   [wanikani-key]
@@ -13,13 +26,13 @@
   [wanikani-key]
   (format "https://www.wanikani.com/api/v1/user/%s/user-information" wanikani-key))
 
-(defn get-due-count
+(defmethod get-due-count :v1
   [wanikani-key]
   (get-in (client/get (study-queue-url wanikani-key)
                       {:as :json})
           [:body :requested_information :reviews_available]))
 
-(defn get-total
+(defmethod get-total :v1
   [wanikani-key]
   (->> (client/get (srs-distribution-url wanikani-key)
                    {:as :json})
@@ -29,7 +42,7 @@
        (map :total)
        (apply +)))
 
-(defn get-username-or-error
+(defmethod get-username-or-error :v1
   [wanikani-key]
   (let [result (client/get (user-information-url wanikani-key)
                            {:as :json
