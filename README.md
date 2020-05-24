@@ -75,6 +75,6 @@ to run migrations on heroku:
 
 ## Copyright and License
 
-Copyright 2016-2019 Cayenne Geis 
+Copyright 2016-2020 Cayenne Geis 
 
 Available under the Eclipse Public License v2.0

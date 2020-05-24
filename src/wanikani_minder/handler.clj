@@ -70,7 +70,9 @@
                                                        :slug (:slug params)}})
                         nil)
           user (user/get beeminder-username)
-          user-data {:goals (map :beeminder-slug (goal/get-by-user user))}]
+          user-data {:goals (map :beeminder-slug (goal/get-by-user user))
+                     :wanikani-api-version (wanikani/api-key-version
+                                            (:wanikani-api-key user))}]
       (pages/logged-in-homepage user user-data action-data))
     (pages/logged-out-homepage (authorize-url))))
 

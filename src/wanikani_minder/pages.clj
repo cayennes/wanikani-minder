@@ -27,7 +27,7 @@
 
 (defn logged-in-homepage
   [{:keys [beeminder-id wanikani-api-key]}
-   {:keys [goals]}
+   {:keys [goals wanikani-api-version]}
    {:keys [create-goal wanikani]}]
   (html [:div
          [:h1 "WaniKani Minder"]
@@ -38,13 +38,16 @@
           (if-let [username (:username wanikani)]
             [:p {:style "color:green"} "Stored token for WaniKani user " username])
           (if-let [e (:error wanikani)]
-            [:p (error-span "Invalid token. Are you sure it is your current API v1 (not v2) token?")])
+            [:p (error-span "Invalid token.")])
           (ring-af/anti-forgery-field)
-          [:p [:label {:for "wanikani-api-key"} "WaniKani v1 API key: "]
+          [:p [:label {:for "wanikani-api-key"} "WaniKani Personal Access Token: "]
            [:input {:type :text :id "wanikani-api-key" :name "wanikani-api-key"}]
            " currently " (if wanikani-api-key wanikani-api-key "unset")
            [:br]
-           "You can find this at the bottom of " [:a {:href "https://www.wanikani.com/settings/personal_access_tokens"} "this page in your WaniKani's settings"]]
+
+           (if (= :v1 wanikani-api-version)
+             [:p {:style "color:red"} "You are currently using a WaniKani API v1 Key. You must update to a v2 Personal Access Token by September 1, 2020. WaniKani isgoing to turn off access to the v1 API at that point."])
+           "You can find this on " [:a {:href "https://www.wanikani.com/settings/personal_access_tokens"} "this page in your WaniKani settings."]]
           [:p [:button {:type :submit :name "action" :value "wanikani"} "Update"]]]
          [:h2 "Create Beeminder goal"]
          (if-not wanikani-api-key
