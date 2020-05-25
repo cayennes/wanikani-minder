@@ -3,8 +3,12 @@
   :url "http://example.com/FIXME"
   :min-lein-version "2.0.0"
 
+  :main wanikani-minder.main
+
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [compojure "1.5.1"]
+                 [ring/ring-core "1.6.3"]
+                 [ring/ring-jetty-adapter "1.6.3"]
                  [ring/ring-defaults "0.2.1"]
                  [ring/ring-json "0.4.0"]
                  [ring-logger "1.0.1"]
@@ -15,10 +19,6 @@
                  [ragtime "0.7.1"]
                  [com.layerware/hugsql "0.4.8"]
                  [com.carouselapps/to-jdbc-uri "0.5.0"]]
-
-  :plugins [[lein-ring "0.9.7"]]
-
-  :ring {:handler wanikani-minder.handler/app}
 
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]

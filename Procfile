@@ -1,1 +1,1 @@
-web: lein with-profile -dev ring server-headless $PORT
+web: lein with-profile -dev run $PORT
