@@ -147,8 +147,10 @@
   #{:access_token :authorization :password :token :secret :secret-key :secret-token})
 
 (def app
-  (-> (routes api-routes
-              (wrap-defaults site-routes site-defaults))
-      (logger/wrap-with-logger {:redact-key? redact-keys})
-      (json/wrap-json-response)
-      (wrap-defaults api-defaults)))
+  (routes (-> site-routes
+              (wrap-defaults site-defaults)
+              (logger/wrap-with-logger {:redact-key? redact-keys}))
+          (-> api-routes
+              (logger/wrap-with-logger {:redact-key? redact-keys})
+              (json/wrap-json-response)
+              (wrap-defaults api-defaults))))
