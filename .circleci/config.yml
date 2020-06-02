@@ -5,9 +5,11 @@ jobs:
     working_directory: ~/wanikani-minder
     docker:
       - image: circleci/clojure:lein-2.7.1
+      - image: circleci/postgres:9.6.9-alpine
     environment:
       JVM_OPTS: -Xmx3200m # limit the maximum heap size to prevent out of memory errors
       LEIN_ROOT: "true"
+      DATABASE_URL: postgres://root@localhost:5432/postgres
     steps:
       - checkout
       - restore_cache:
@@ -17,4 +19,5 @@ jobs:
           paths:
             - ~/.m2
           key: cci-demo-clojure-{{ checksum "project.clj" }}
+      - run: lein migrate
       - run: lein test
