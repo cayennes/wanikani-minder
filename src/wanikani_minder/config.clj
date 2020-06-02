@@ -5,5 +5,4 @@
                :client-id (System/getenv "BEEMINDER_CLIENT_ID")
                :client-name (System/getenv "BEEMINDER_CLIENT_NAME")}
    :base-url (System/getenv "BASE_URL")
-   :database-url (System/getenv "DATABASE_URL")
-   :port (System/getenv "PORT")})
+   :database-url (System/getenv "DATABASE_URL")})
