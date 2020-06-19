@@ -3,6 +3,7 @@
             [compojure.core :refer [routes defroutes GET POST]]
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults site-defaults]]
+            [ring.middleware.session.memory :as smemory]
             [ring.logger :as logger]
             [ring.util.codec :refer [url-encode]]
             [ring.util.response :as response]
@@ -79,12 +80,14 @@
 (defn login
   [session access-token username]
   (user/beeminder-create-or-update! {:username username :access-token access-token})
-  (assoc-in (response/redirect "/")
-            [:session :beeminder] {:username username :token access-token}))
+  (-> (response/redirect "/")
+      (assoc :session
+             (assoc session :beeminder {:username username :token access-token}))))
 
 (defn logout
-  [session]
-  (update (response/redirect "/") :session dissoc :beeminder))
+  []
+  (-> (response/redirect "/")
+      (assoc :session nil)))
 
 (defn get-configured-goal
   "if the goal is configred, return it even if it has a new slug name"
@@ -130,7 +133,7 @@
        (if-not error
          (login session access_token username)
          (pages/error error error_description)))
-  (GET "/auth/logout" {session :session} (logout session))
+  (GET "/auth/logout" _ (logout))
   (route/not-found (pages/error "not found" "No page found with this URL")))
 
 (defroutes api-routes
@@ -148,7 +151,8 @@
 
 (def app
   (routes (-> site-routes
-              (wrap-defaults site-defaults)
+              (wrap-defaults (assoc site-defaults
+                                    :session {:store (smemory/memory-store)}))
               (logger/wrap-with-logger {:redact-key? redact-keys}))
           (-> api-routes
               (logger/wrap-with-logger {:redact-key? redact-keys})
